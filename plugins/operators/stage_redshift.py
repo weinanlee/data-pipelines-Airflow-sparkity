@@ -1,18 +1,23 @@
 from airflow.hooks.postgres_hook import PostgresHook
 from airflow.contrib.hooks.aws_hook import AwsHook
-
 from airflow.models import BaseOperator
 from airflow.utils.decorators import apply_defaults
 
-
 class StageToRedshiftOperator(BaseOperator):
     ui_color = '#358140'
+    copy_sql = """
+    COPY {}
+    FROM '{}'
+    ACCESS_KEY_ID '{}'
+    SECRET_ACCESS_KEY '{}'
+    {}
+    """
 
     @apply_defaults
     def __init__(self,
-                 s3_bucket,
-                 s3_prefix,
-                 table,
+                 s3_bucket = '',
+                 s3_prefix = '',
+                 table = '',
                  redshift_conn_id = 'redshift',
                  aws_conn_id = 'aws_credentials',
                  copy_options ='',
@@ -28,28 +33,29 @@ class StageToRedshiftOperator(BaseOperator):
 
     def execute(self, context):
         ## AWS setup
-        aws_hook = AwsHook("aws_credentials")
+        aws_hook = AwsHook(self.aws_conn_id)
         credentials = aws_hook.get_credentials()
-        redshift_hook = PostgresHook("redshift")
+        redshift_hook = PostgresHook(postgres_conn_id=self.redshift_conn_id)
 
-        self.log.info(f'Preparing to stage data from {self.s3_bucket}/{s3.s3_prefix} to {self.table} table... ')
+        self.log.info(f'Preparing to stage data from {self.s3_bucket}/{self.s3_prefix} to {self.table} table... ')
 
-        copy_query = """
-        COPY {table} 
-        FROM 's3://{s3_bucket}/{s3_prefix}'
-        WITH credentials
-        'aws_access_id={access_key};
-        aws_secret_access_key={secrect_key}'
-        {copy_options};
-        """.format(table = self.table,
-                   s3_bucket = self.s3_bucket,
-                   access_key = self.credentials.access_key,
-                   secrect_key =self.credentials.secrect_key,
-                   copy_options = self.copy_options)
+        
+        s3_path = "s3://{}/{}".format(self.s3_bucket, self.s3_prefix)
+        formatted_sql = StageToRedshiftOperator.copy_sql.format(
+            self.table,
+            s3_path,
+            credentials.access_key,
+            credentials.secret_key,
+            self.copy_options
+        )
 
         self.log.info("Excuting COPY command...")
-        redshift_hook.run(copy_query)
+        redshift_hook.run(formatted_sql)
         self.log.info("COPY command completed.")
+
+
+
+
 
 
 
