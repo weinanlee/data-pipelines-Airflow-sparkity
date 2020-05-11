@@ -10,21 +10,30 @@ from helpers import SqlQueries
 # AWS_SECRET = os.environ.get('AWS_SECRET')
 
 default_args = {
-    'owner': 'udacity',
+    'owner': 'weinanlee',
     'start_date': datetime(2019, 1, 12),
+    'depends_on_past': False,
+    'retries': 0,
+    'retry_delay' : 300,
+    'email_on_retry' : False
 }
 
 dag = DAG('udac_example_dag',
           default_args=default_args,
-          description='Load and transform data in Redshift with Airflow',
-          schedule_interval='0 * * * *'
+          description='Load and transform data from S3 to Redshift with Airflow',
+          schedule_interval='@hourly',
+          catchup = False
         )
 
 start_operator = DummyOperator(task_id='Begin_execution',  dag=dag)
 
 stage_events_to_redshift = StageToRedshiftOperator(
     task_id='Stage_events',
-    dag=dag
+    dag=dag,
+    s3_bucket='udacity-dend',
+    s3_prefix='log_data',
+    table='staging_events',
+    copy_options="JSON 's3://udacity-dend/log_json_path.json'"
 )
 
 stage_songs_to_redshift = StageToRedshiftOperator(
@@ -63,3 +72,5 @@ run_quality_checks = DataQualityOperator(
 )
 
 end_operator = DummyOperator(task_id='Stop_execution',  dag=dag)
+
+
