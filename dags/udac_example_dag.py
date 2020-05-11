@@ -38,7 +38,11 @@ stage_events_to_redshift = StageToRedshiftOperator(
 
 stage_songs_to_redshift = StageToRedshiftOperator(
     task_id='Stage_songs',
-    dag=dag
+    dag=dag,
+    s3_bucket='udacity-dend',
+    s3_prefix='song_data',
+    table='staging_songs',
+    copy_options="JSON 'auto'"
 )
 
 load_songplays_table = LoadFactOperator(
@@ -73,4 +77,6 @@ run_quality_checks = DataQualityOperator(
 
 end_operator = DummyOperator(task_id='Stop_execution',  dag=dag)
 
-
+## DAG's dependencies
+start_operator >> stage_events_to_redshift 
+start_operator >> stage_songs_to_redshift 
