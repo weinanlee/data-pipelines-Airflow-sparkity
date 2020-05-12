@@ -15,7 +15,7 @@ data-pipelines-airflow-sparkify
 │   create_tables.sql            # Create tables in redshift
 │   pics                         # Images for projects
 │   README.md                    # Project description
-|   example-dag.png                      # Pipeline DAG image
+|   example-dag.png              # Pipeline DAG image
 │   
 └───airflow                      # Airflow home
 |   |               
