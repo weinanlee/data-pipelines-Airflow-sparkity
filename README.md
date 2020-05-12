@@ -46,7 +46,9 @@ Use Airflow's UI to configure your AWS credentials and connection to Redshift.
 ![image](https://github.com/weinanlee/data-pipelines-airflow-sparkify/blob/master/pics/admin-connections.png)
 
 3. Under Connections, select Create.
+
 ![image](https://github.com/weinanlee/data-pipelines-airflow-sparkify/blob/master/pics/create-connection.png)
+
 4. On the create connection page, enter the following values:
 
 - Conn Id: Enter aws_credentials.
@@ -55,6 +57,7 @@ Use Airflow's UI to configure your AWS credentials and connection to Redshift.
 - Password: Enter your Secret access key from the IAM User credentials you downloaded earlier.
 
 Once you've entered these values, select Save and Add Another.
+
 ![image](https://github.com/weinanlee/data-pipelines-airflow-sparkify/blob/master/pics/connection-aws-credentials.png)
 
 
@@ -68,6 +71,7 @@ Once you've entered these values, select Save and Add Another.
 - Password: Enter the password you created when launching your Redshift cluster.
 - Port: Enter 5439.
 Once you've entered these values, select Save.
+
 ![image](https://github.com/weinanlee/data-pipelines-airflow-sparkify/blob/master/pics/cluster-details.png)
 ![image](https://github.com/weinanlee/data-pipelines-airflow-sparkify/blob/master/pics/connection-redshift.png)
 
@@ -102,5 +106,6 @@ For each the test, the test result and expected result needs to be checked and i
 2. Refresh the page and click on the uda_example_dag to view the current state.
 
 3. The whole pipeline should take around 10 minutes to complete.
+
 ![image](https://github.com/weinanlee/data-pipelines-airflow-sparkify/blob/master/pics/result-airflow-tree.png)
 ![image](https://github.com/weinanlee/data-pipelines-airflow-sparkify/blob/master/pics/result-airflow-graph.png)
